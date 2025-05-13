@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct StudioView: View {
-    @StateObject private var audioModel = AudioEngineModel()
+    @State private var audioModel = AudioEngineModel()
     @State private var exportMessage = ""
     
     var body: some View {
@@ -32,19 +32,14 @@ struct StudioView: View {
     var playSection: some View {
         GroupBox(label: Text("Lecture")) {
             Button(action: {
-                Task {
-                    await audioModel.playAudio()
-                }
+                audioModel.playAudio()
             }) {
                 HStack {
                     Image(systemName: audioModel.isPlaying ? "pause.circle.fill" : "play.circle.fill")
                         .font(.system(size: 30))
                     Text(audioModel.isPlaying ? "Pause" : "Lecture")
                 }
-                .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.blue.opacity(0.2))
-                .cornerRadius(10)
             }
             
             VStack(alignment: .leading) {
@@ -66,10 +61,15 @@ struct StudioView: View {
                 }
             }) {
                 Label(audioModel.isRecording ? "Arrêter" : "Enregistrer", systemImage: audioModel.isRecording ? "stop.circle.fill" : "mic.circle.fill")
-                .padding()
-                .cornerRadius(10)
+                    .padding()
             }
-            
+            GeometryReader { geometry in
+                Rectangle()
+                    .fill(Color.blue)
+                    .frame(width: geometry.size.width * CGFloat(audioModel.amplitude), height: 30)
+                    .animation(.linear(duration: 0.1), value: audioModel.amplitude)
+            }
+            .frame(height: 30)
             VStack(alignment: .leading) {
                 Text("Volume du micro: \(Int(audioModel.micVolume * 100))%")
                 Slider(value: $audioModel.micVolume, in: 0...1)
@@ -90,10 +90,6 @@ struct StudioView: View {
                 }
             }) {
                 Text("Exporter en M4A")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.green.opacity(0.2))
-                    .cornerRadius(10)
             }
             .padding(.top)
             

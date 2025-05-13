@@ -11,7 +11,14 @@ import SwiftUI
 struct AudioLabApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TabView {
+                Tab("StudioView", systemImage: "") {
+                    StudioView()
+                }
+                Tab("AudioLoopBackView", systemImage: "") {
+                    AudioLoopBackView()
+                }
+            }
         }
     }
 }
